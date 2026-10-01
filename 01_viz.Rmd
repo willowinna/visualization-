@@ -1,0 +1,107 @@
+---
+title: "Visualization"
+output: github_document
+---
+
+```{r}
+library(tidyverse)
+library(ggridges)
+
+library(p8105.datasets)
+data("weather_df")
+```
+
+Now we have everything we need.
+
+```{r}
+weather_df
+```
+
+
+scatter plot
+
+```{r}
+ggplot(weather_df, aes(x = tmin, y = tmax))
+```
+
+```{r}
+ggplot(weather_df, aes(x = tmin, y = tmax)) +
+  geom_point()
+```
+
+```{r}
+ggp_temp_scatterplot =
+  weather_df |>
+  ggplot(aes(x = tmin, y = tmax)) + 
+  geom_point()
+
+ggp_temp_scatterplot
+```
+
+color label(colour = ), transparent (alpha = ), smooth curve(geom_smooth = )
+
+```{r}
+weather_df |>
+  ggplot(aes(x = tmin, y = tmax, colour = name)) + 
+  geom_point(alpha = 0.25)+
+  geom_smooth(se = FALSE)
+```
+
+#把`colour/color`放到`ggplot(aes())`：**点和拟合线都会按 name 分组，多条线**
+#把`colour/color`放到`geom_point(aes())`：**只有点分组上色，平滑曲线用全部数据画一条**
+
+```{r}
+weather_df |>
+  ggplot(aes(x = tmin, y = tmax)) + 
+  geom_point(aes(color = name),alpha = 0.25)+
+  geom_smooth(se = FALSE)
+```
+
+
+Show faceting(separate by ...)
+
+```{r}
+weather_df |>
+  ggplot(aes(x = tmin, y = tmax, colour = name)) + 
+  geom_point(alpha = 0.5)+
+  facet_grid(. ~ name)
+```
+
+```{r}
+weather_df |>
+  ggplot(aes(x = tmin, y = tmax, colour = name)) + 
+  geom_point(alpha = 0.5)+
+  facet_grid(name ~ .)
+```
+
+```{r}
+weather_df |>
+  ggplot(aes(x = tmin, y = tmax, colour = name)) + 
+  geom_point(alpha = 0.5)+
+  facet_grid(cols = vars(name))
+```
+
+
+let's look at something else.
+
+```{r}
+weather_df |>
+  ggplot(aes(x = date, y = tmax, colour = name)) + 
+  geom_point(aes(size = prcp),alpha = 0.5) +
+  geom_smooth(se = FALSE) +
+  facet_grid(. ~ name)
+```
+
+
+```{r}
+weather_df |>
+  filter(name == "CentralPark_NY") |>
+  mutate(
+    tmax = tmax * (9 / 5) + 32,
+    tmax = tmax * (9 / 5) + 32
+
+  ) |>
+  ggplot(aes(x = tmin, y = tmax)) + 
+  geom_point()
+```
+
