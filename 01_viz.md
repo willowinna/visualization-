@@ -324,3 +324,31 @@ weather_df |>
     ## (`stat_density_ridges()`).
 
 ![](01_viz_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
+
+\##save some of my plots
+
+``` r
+ggp_weather =
+  weather_df |>
+  ggplot(aes(x = date, y = tmax, colour = name)) +
+  geom_point(aes(size = prcp), alpha = 0.5) +
+  facet_grid(. ~ name)
+
+ggsave("images/ggp_weather.pdf",ggp_weather)
+```
+
+    ## Saving 7 x 5 in image
+
+    ## Warning: Removed 19 rows containing missing values or values outside the scale range
+    ## (`geom_point()`).
+
+``` r
+weather_df |>
+  ggplot(aes(x = tmin, y = tmax)) + 
+  geom_point()
+```
+
+    ## Warning: Removed 17 rows containing missing values or values outside the scale range
+    ## (`geom_point()`).
+
+![](01_viz_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->

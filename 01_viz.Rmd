@@ -186,3 +186,22 @@ weather_df |>
   geom_density_ridges()
 ```
 
+
+##save some of my plots
+
+```{r}
+ggp_weather =
+  weather_df |>
+  ggplot(aes(x = date, y = tmax, colour = name)) +
+  geom_point(aes(size = prcp), alpha = 0.5) +
+  facet_grid(. ~ name)
+
+ggsave("images/ggp_weather.pdf",ggp_weather)
+```
+
+```{r fig.width=12, fig.height=12}
+weather_df |>
+  ggplot(aes(x = tmin, y = tmax)) + 
+  geom_point()
+```
+
