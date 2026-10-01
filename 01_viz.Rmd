@@ -104,4 +104,85 @@ weather_df |>
   ggplot(aes(x = tmin, y = tmax)) + 
   geom_point()
 ```
+`mutate()`：**新增列，或者原地修改现有列**，返回完整的数据集（保留原来所有列）
+
+what's a hexplot
+
+```{r}
+
+weather_df |>
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_hex()
+```
+
+## univariate plots
+
+```{r}
+weather_df |>
+  ggplot(aes(x = tmax)) +
+  geom_histogram()
+```
+
+```{r}
+weather_df |>
+  ggplot(aes(x = tmax, fill = name)) +
+  geom_histogram(pos = "dodge")
+```
+
+```{r}
+weather_df |>
+  ggplot(aes(x = tmax, fill = name)) +
+  geom_histogram() + 
+  facet_grid(. ~ name)
+```
+
+Density plots
+
+```{r}
+weather_df |>
+  ggplot(aes(x = tmax, colour = name)) +
+  geom_density()
+```
+
+fill 填色
+
+```{r}
+weather_df |>
+  ggplot(aes(x = tmax, fill = name)) +
+  geom_density(alpha = 0.3)
+```
+
+
+boxplot
+
+```{r}
+weather_df |>
+  ggplot(aes(y = tmax)) +
+  geom_boxplot()
+```
+
+加x会根据x生成多个
+
+
+```{r}
+weather_df |>
+  ggplot(aes(x = name, y = tmax)) +
+  geom_boxplot()
+```
+
+Violin
+
+```{r}
+weather_df |>
+  ggplot(aes(x = name, y = tmax)) +
+  geom_violin()
+```
+
+ridge plots
+
+```{r}
+weather_df |>
+  ggplot(aes(x = tmax, y = name)) +
+  geom_density_ridges()
+```
 
