@@ -1,0 +1,216 @@
+---
+title: "02_viz"
+output: github_document
+---
+
+```{r}
+library(tidyverse)
+library(p8105.datasets)
+library(patchwork)
+data("weather_df")
+
+```
+
+##colors
+start with scatter
+```{r}
+weather_df |>
+  ggplot(aes(x = tmax, y = tmin, colour = name)) +
+  geom_point() +
+  labs(
+    title = "temperature",
+    x = "max temperature",
+    y = "min temperaturer",
+    color = "location",
+    caption = "data frame NOAA for 3 weather stations"
+  ) +
+  scale_x_continuous(
+    breaks = c(-10, 0, 15),
+    labels = c("-10 C", "0", "fifteen")
+  ) +
+  scale_y_continuous(
+    trans = "sqrt",
+    position = "right"
+  )
+```
+
+lets look at the colors
+
+```{r}
+weather_df |>
+  ggplot(aes(x = tmax, y = tmin, colour = name)) +
+  geom_point() + 
+  scale_color_hue(h = c(500,200))
+```
+
+viridis最常用
+```{r}
+weather_df |>
+  ggplot(aes(x = tmax, y = tmin, colour = name)) +
+  geom_point() + 
+  viridis::scale_color_viridis(
+    name = "Location",
+    discrete = TRUE
+  )
+```
+
+##themes
+
+theme_bw()
+theme_classic
+```{r}
+weather_df |>
+  ggplot(aes(x = tmax, y = tmin, colour = name)) +
+  geom_point() + 
+  viridis::scale_color_viridis(
+    name = "Location",
+    discrete = TRUE
+  ) + 
+  theme_bw() +
+  theme(legend.position = "bottom")
+```
+
+
+先设置theme再调位置
+```{r}
+weather_df |>
+  ggplot(aes(x = tmax, y = tmin, colour = name)) +
+  geom_point() + 
+  viridis::scale_color_viridis(
+    name = "Location",
+    discrete = TRUE
+  ) + 
+  theme(legend.position = "bottom") +
+  theme_bw() 
+```
+
+exercise
+```{r}
+weather_df |>
+  ggplot(aes(x = date, y = tmax, colour = name)) +
+  geom_point() + 
+  geom_smooth(se = FALSE) +
+  labs(
+    title = "seasonal trends",
+    x = "date",
+    y = "max temperaturer",
+    color = "location",
+    caption = "max daily temp in 3 weather stations in 2021 and 2020",
+  ) +
+  viridis::scale_color_viridis(
+    discrete = TRUE
+  ) + 
+  theme_minimal() +
+  theme(legend.position = "bottom") 
+ 
+```
+
+##two more weird but useful plot things
+
+```{r}
+central_park_df =
+  weather_df |>
+  filter(name == "CentralPark_NY")
+
+molokai_df =
+  weather_df |>
+  filter(name == "Molokai_HI")
+
+ggplot(molokai_df, aes(x = date, y = tmax, color = name)) +
+  geom_point() +
+  geom_line(data = central_park_df)
+
+```
+
+
+multiple panels with different plot types
+
+```{r}
+ggp_tmax_tmin =
+  weather_df |>
+  ggplot(aes(x = tmin, y = tmax, color = name)) +
+  geom_point() +
+  theme(legend.position = "none")
+
+ggp_prcp_density =
+  weather_df |>
+  filter(prcp >0) |>
+  ggplot(aes(x = prcp, fill = name)) +
+  geom_density(alpha = 0.5) +
+  theme(legend.position = "none")
+
+ggp_seasonal =
+  weather_df |>
+  ggplot(aes(x = date, y = tmin, colour = name)) +
+  geom_point() +
+  theme(legend.position = "bottom")
+
+(ggp_tmax_tmin + ggp_prcp_density)/ggp_seasonal
+
+```
+
+##data manipulation
+
+start with some factors
+
+boxplots!
+
+```{r}
+weather_df |>
+  mutate(name = fct_relevel(name, c("Molokai_HI", "CentralPark_NY", "Waterhole_WA"))) |>
+  ggplot(aes(x = name, y = tmax)) +
+  geom_boxplot()
+```
+
+```{r}
+weather_df |>
+  mutate(name = fct_reorder(name, tmax)) |>
+  ggplot(aes(x = name, y = tmax)) +
+  geom_boxplot()
+```
+
+
+applications(make distribution plot)
+
+```{r}
+weather_df |>
+  select(name, tmax, tmin) |>
+  pivot_longer(
+    tmax:tmin,
+    names_to = "observation",
+    values_to = "temp"
+  ) |>
+  ggplot(aes(x = temp, fill = observation)) +
+  geom_density(alpha = 0.5) +
+  facet_grid(. ~ name)
+
+```
+
+
+make a FAS plot
+```{r}
+pups_df =
+  read_csv("FAS_pups.csv", skip =3, na = c("", ".", "NA")) |>
+  janitor::clean_names()
+
+litters_df =
+  read_csv("FAS_litters.csv", na = c("", ".", "NA")) |>
+  janitor::clean_names() |>
+  separate(group, into = c("dose", "day_of_tx"), 3)
+
+fas_df =
+  left_join(pups_df, litters_df, by = "litter_number")
+
+fas_df |>
+  select(dose, day_of_tx, starts_with("pd")) |>
+  pivot_longer(
+    starts_with("pd"),
+    names_to = "outcome",
+    values_to = "pn_day"
+  ) |>
+  drop_na() |>
+  ggplot(aes(x = dose, y = pn_day)) +
+  geom_boxplot() +
+  facet_grid(day_of_tx ~ outcome)
+```
+
